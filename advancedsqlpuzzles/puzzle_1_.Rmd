@@ -1,0 +1,117 @@
+---
+title: 
+author: Jun
+output: html_document
+---
+```{r include = FALSE}
+# import libraries
+library(DT)
+library(dplyr)
+library(vroom)
+```
+# Goal:
+
+# Summary:
+
+## Notes:
+
+## Steps:
+
+## Todo:
+
+## Info:
+
+
+
+## EDA
+
+### Puzzle 1
+Prep in oracle
+```
+-- not working?
+INSERT INTO Cart1 (Item)
+    WITH temp AS (
+        SELECT 'Sugar' FROM dual UNION ALL
+        SELECT 'Bread' FROM dual UNION ALL
+        SELECT 'Juice' FROM dual UNION ALL
+        SELECT 'Soda' FROM dual UNION ALL
+        SELECT 'Flour' FROM dual
+)
+SELECT * FROM Cart1;
+
+INSERT INTO Cart1 
+VALUES ('Sugar');
+INSERT INTO Cart1 
+VALUES ('Bread');
+INSERT INTO Cart1 
+VALUES ('Juice');
+INSERT INTO Cart1 
+VALUES ('Soda');
+INSERT INTO Cart1 
+VALUES ('Flour');
+
+
+
+
+INSERT INTO Cart2
+    WITH temp AS (
+        SELECT 'Sugar' FROM dual UNION ALL
+        SELECT 'Bread' FROM dual UNION ALL
+        SELECT 'Butter' FROM dual UNION ALL
+        SELECT 'Cheese' FROM dual UNION ALL
+        SELECT 'Fruit' FROM dual 
+)
+SELECT * FROM Cart2;
+
+INSERT INTO Cart2 
+VALUES ('Sugar');
+INSERT INTO Cart2 
+VALUES ('Bread');
+INSERT INTO Cart2 
+VALUES ('Butter');
+INSERT INTO Cart2 
+VALUES ('Cheese');
+INSERT INTO Cart2 
+VALUES ('Fruit');
+
+
+```
+
+my solution
+```
+SELECT 
+    c1.Item AS "Item Cart 1",
+    c2.Item AS "Item Cart 2"
+FROM Cart1 c1
+    FULL OUTER JOIN Cart2 c2 ON c1.Item = c2.Item
+ORDER BY (CASE -- CASE c1.Item 
+             WHEN c1.Item = 'Sugar' THEN 1
+             WHEN c1.Item ='Bread' THEN 2
+             WHEN c1.Item ='Juice' THEN 3
+             WHEN c1.Item ='Soda' THEN 4
+             WHEN c1.Item ='Flour' THEN 5
+             WHEN c2.Item ='Butter' THEN 6
+             WHEN c2.Item ='Cheese' THEN 7
+             WHEN c2.Item ='Fruit' THEN 8
+        END)
+;
+
+```
+
+
+### Puzzle 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
