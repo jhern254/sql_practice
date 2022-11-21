@@ -102,6 +102,169 @@ ORDER BY (CASE -- CASE c1.Item
 ### Puzzle 2
 
 
+```
+DROP TABLE IF EXISTS #Employees;
+
+CREATE TABLE Employees
+(
+EmployeeID  NUMERIC PRIMARY KEY,
+ManagerID   NUMERIC,
+JobTitle    VARCHAR(100),
+Salary      NUMERIC
+);
+
+INSERT INTO Employees VALUES
+(1001,NULL,'President',185000);
+INSERT INTO Employees VALUES
+(2002,1001,'Director',120000);
+INSERT INTO Employees VALUES
+(3003,1001,'Office Manager',97000);
+INSERT INTO Employees VALUES
+(4004,2002,'Engineer',110000);
+INSERT INTO Employees VALUES
+(5005,2002,'Engineer',142000);
+INSERT INTO Employees VALUES
+(6006,2002,'Engineer',160000);
+
+
+```
+
+
+my sol.
+```
+-- rank based on man. id?
+SELECT 
+    JobTitle,
+    
+FROM Employees 
+    
+
+
+
+```
+
+
+
+### Puzzle 4
+DDL 
+```
+CREATE TABLE Orders
+(
+CustomerID      INTEGER,
+OrderID         VARCHAR(100),
+DeliveryState   VARCHAR(100),
+Amount          NUMERIC,
+PRIMARY KEY (CustomerID, OrderID)
+);
+
+INSERT INTO Orders 
+WITH temp AS (
+    SELECT 1001,'Ord936254','CA',340 FROM dual UNION ALL
+    SELECT 1001,'Ord143876','TX',950 FROM dual UNION ALL 
+    SELECT 1001,'Ord654876','TX',670 FROM dual UNION ALL
+    SELECT 1001,'Ord814356','TX',860 FROM dual UNION ALL
+    SELECT 2002,'Ord342176','WA',320 FROM dual UNION ALL
+    SELECT 3003,'Ord265789','CA',650 FROM dual UNION ALL
+    SELECT 3003,'Ord387654','CA',830 FROM dual UNION ALL
+    SELECT 4004,'Ord476126','TX',120 FROM dual 
+)
+SELECT * FROM temp;
+
+```
+
+my sol
+```
+-- cte sol.
+WITH ca
+AS
+(
+    SELECT DISTINCT CustomerID
+    FROM Orders
+    WHERE DeliveryState = 'CA'
+)
+SELECT od.*
+FROM Orders od 
+    JOIN ca ON od.CustomerID = ca.CustomerID     
+WHERE od.DeliveryState = 'TX'
+ORDER BY od.OrderID
+;
+-- works
+
+
+-- listagg sol
+WITH ca
+AS
+(
+SELECT 
+    CustomerID,
+    CASE WHEN 
+        (LISTAGG(DeliveryState, ',') WITHIN GROUP (ORDER BY CustomerID) LIKE '%CA%' 
+        AND LISTAGG(DeliveryState, ',') WITHIN GROUP (ORDER BY CustomerID) LIKE '%TX%')
+            THEN 'Y'
+        ELSE 'N'
+    END AS Deliveries
+FROM Orders
+GROUP BY CustomerID
+)
+SELECT od.*    
+FROM Orders od 
+    JOIN ca ON od.CustomerID = ca.CustomerID     
+--WHERE ca.Deliveries LIKE '%CA%' AND ca.Deliveries LIKE '%TX%'
+WHERE Deliveries = 'Y'
+    AND od.DeliveryState = 'TX'
+ORDER BY od.OrderID
+;
+-- works
+
+```
+This is a nice sol. using ListAgg from Oracle analytic fns.
+
+
+### Puzzle 5
+DDL 
+```
+DROP TABLE IF EXISTS PhoneDirectory;
+
+CREATE TABLE PhoneDirectory
+(
+CustomerID  INTEGER,
+Type      VARCHAR(100),
+PhoneNumber VARCHAR(12),
+PRIMARY KEY (CustomerID, Type)
+);
+
+INSERT INTO PhoneDirectory 
+WITH temp AS (
+    SELECT 1001,'Cellular','555-897-5421' FROM dual UNION ALL
+    SELECT 1001,'Work','555-897-6542' FROM dual UNION ALL
+    SELECT 1001,'Home','555-698-9874' FROM dual UNION ALL
+    SELECT 2002,'Cellular','555-963-6544' FROM dual UNION ALL
+    SELECT 2002,'Work','555-812-9856' FROM dual UNION ALL
+    SELECT 3003,'Cellular','555-987-6541' FROM dual 
+)
+SELECT * FROM temp;
+
+```
+
+my sol.
+```
+SELECT * 
+FROM PhoneDirectory
+PIVOT (
+    MAX(PhoneNumber)
+    FOR Type
+    IN (
+        'Cellular',
+        'Work',
+        'Home'
+    )
+)
+ORDER BY CustomerID
+;
+
+```
+Other solutions too based on outer joins/ joins
+
 
 
 
